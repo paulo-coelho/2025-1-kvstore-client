@@ -1,0 +1,13 @@
+[package]
+name = "kv_client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+tonic = { version = "0.11", features = ["codegen", "prost"] }
+prost = "0.12"
+clap = { version = "4", features = ["derive"] }
+
+[build-dependencies]
+tonic-build = "0.11"

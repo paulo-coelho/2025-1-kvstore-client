@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package kvstore;
+
+service KvStore {
+  rpc Put (PutRequest) returns (PutResponse);
+  rpc Get (GetRequest) returns (GetResponse);
+}
+
+// Represents a single entry in a vector clock, associating a node ID with a counter.
+message VectorClockEntry {
+  string node_id = 1;
+  uint64 counter = 2;
+}
+
+// Represents a vector clock, a set of (node_id, counter) pairs, used for causal consistency.
+message VectorClock {
+  repeated VectorClockEntry entries = 1; // List of (NodeId, Counter)
+}
+
+// Represents a specific version of a key's value, including its causal metadata and LWW metadata.
+message Version {
+  string value = 1;             // The actual value stored.
+  VectorClock vector_clock = 2; // The vector clock associated with this version, defining its causal history.
+  uint64 timestamp = 3;         // Timestamp (e.g., nanoseconds since epoch) for Last-Write-Wins resolution.
+  string writer_node_id = 4;    // The ID of the node that originally created this version.
+}
+
+// Represents a store entry for a given key, which can hold multiple conflicting versions.
+message StoreEntry {
+  string key = 1;                 // The key for which the entry is stored.
+  repeated Version versions = 2;  // List of potentially conflicting versions for this key.
+}
+
+// Request message for the Put operation.
+message PutRequest {
+  string key = 1;     // The key to store.
+  string value = 2;   // The value to associate with the key.
+}
+
+// Request message for the Get operation.
+message GetRequest {
+  string key = 1;     // The key to retrieve.
+}
+
+// Response message for the Put operation.
+message PutResponse {
+  bool success = 1;         // Indicates if the Put operation was successful.
+  string error_message = 2; // Provides an error message if the operation failed.
+}
+
+// Response message for the Get operation.
+message GetResponse {
+  repeated Version versions = 1;  // Returns all active versions for the requested key.
+  string error_message = 2;       // Provides an error message if the operation failed.
+}
+
