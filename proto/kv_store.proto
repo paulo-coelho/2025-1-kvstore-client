@@ -26,12 +26,6 @@ message Version {
   string writer_node_id = 4;    // The ID of the node that originally created this version.
 }
 
-// Represents a store entry for a given key, which can hold multiple conflicting versions.
-message StoreEntry {
-  string key = 1;                 // The key for which the entry is stored.
-  repeated Version versions = 2;  // List of potentially conflicting versions for this key.
-}
-
 // Request message for the Put operation.
 message PutRequest {
   string key = 1;     // The key to store.
